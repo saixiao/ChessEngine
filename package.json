@@ -63,7 +63,7 @@
     "babel-plugin-transform-class-properties": "6.24.1",
     "babel-plugin-transform-es2015-modules-commonjs": "6.26.2",
     "babel-polyfill": "6.26.0",
-    "chess.js": "0.10.2",
+    "chess.js": "^0.10.2",
     "clean-webpack-plugin": "0.1.19",
     "codecov": "3.0.2",
     "commitizen": "2.10.1",

@@ -1,22 +1,13 @@
 import React, { Component } from 'react';
 
-import WithMoveValidation from './integrations/WithMoveValidation';
 import PlayRandomMoveEngine from './integrations/PlayRandomMoveEngine';
-import RandomVsRandomGame from './integrations/RandomVsRandomGame';
-import CustomizedBoard from './integrations/CustomizedBoard';
-import AllowDragFeature from './integrations/AllowDrag';
-import PrestoChangoExample from './integrations/PrestoChango';
-import UndoMove from './integrations/UndoMove';
+import LevelOne from "./integrations/LevelOne";
 
 class Demo extends Component {
   state = {
-    showCustomizedBoard: false,
-    showWithMoveValidation: false,
-    showRandomVsRandomGame: false,
-    showPlayRandomMoveEngine: false,
-    showAllowDragFeature: false,
-    showPrestoChango: false,
-    showUndoMove: false
+    LevelOne: false,
+    LevelTwo: false,
+    LevelThree: false
   };
   render() {
     return (
@@ -25,130 +16,44 @@ class Demo extends Component {
           <button
             onClick={() =>
               this.setState({
-                showCustomizedBoard: true,
-                showWithMoveValidation: false,
-                showRandomVsRandomGame: false,
-                showPlayRandomMoveEngine: false,
-                showAllowDragFeature: false,
-                showPrestoChango: false,
-                showUndoMove: false
+                LevelOne: true,
+                LevelTwo: false,
+                LevelThree: false
               })
             }
-            style={{ ...buttonStyle, ...{ backgroundColor: 'orange' } }}
+            style={{ ...buttonStyle, ...{ backgroundColor: 'brown' } }}
           >
-            Custom Board
+            Play a level One Engine
           </button>
           <button
             onClick={() =>
               this.setState({
-                showCustomizedBoard: false,
-                showWithMoveValidation: true,
-                showRandomVsRandomGame: false,
-                showPlayRandomMoveEngine: false,
-                showAllowDragFeature: false,
-                showPrestoChango: false,
-                showUndoMove: false
-              })
-            }
-            style={{
-              ...buttonStyle,
-              ...{ backgroundColor: 'purple', color: 'white' }
-            }}
-          >
-            With Move Validation
-          </button>
-          <button
-            onClick={() =>
-              this.setState({
-                showCustomizedBoard: false,
-                showWithMoveValidation: false,
-                showRandomVsRandomGame: true,
-                showPlayRandomMoveEngine: false,
-                showAllowDragFeature: false,
-                showPrestoChango: false,
-                showUndoMove: false
-              })
-            }
-            style={{ ...buttonStyle, ...{ backgroundColor: 'gold' } }}
-          >
-            Random Vs Random
-          </button>
-          <button
-            onClick={() =>
-              this.setState({
-                showCustomizedBoard: false,
-                showWithMoveValidation: false,
-                showRandomVsRandomGame: false,
-                showPlayRandomMoveEngine: true,
-                showAllowDragFeature: false,
-                showPrestoChango: false,
-                showUndoMove: false
+                LevelOne: false,
+                LevelTwo: true,
+                LevelThree: false
               })
             }
             style={{ ...buttonStyle, ...{ backgroundColor: 'silver' } }}
           >
-            Play a Random Move Engine
+            Play a level Two Engine
           </button>
           <button
             onClick={() =>
               this.setState({
-                showCustomizedBoard: false,
-                showWithMoveValidation: false,
-                showRandomVsRandomGame: false,
-                showPlayRandomMoveEngine: false,
-                showAllowDragFeature: true,
-                showPrestoChango: false,
-                showUndoMove: false
+                LevelOne: false,
+                LevelTwo: false,
+                LevelThree: true
               })
             }
-            style={{ ...buttonStyle, ...{ backgroundColor: 'aqua' } }}
+            style={{ ...buttonStyle, ...{ backgroundColor: 'gold' } }}
           >
-            Conditionally Disable Drag
-          </button>
-          <button
-            onClick={() =>
-              this.setState({
-                showCustomizedBoard: false,
-                showWithMoveValidation: false,
-                showRandomVsRandomGame: false,
-                showPlayRandomMoveEngine: false,
-                showAllowDragFeature: false,
-                showPrestoChango: true,
-                showUndoMove: false
-              })
-            }
-            style={{
-              ...buttonStyle,
-              ...{ backgroundColor: 'brown', color: 'white' }
-            }}
-          >
-            Presto Chango
-          </button>
-          <button
-            onClick={() =>
-              this.setState({
-                showCustomizedBoard: false,
-                showWithMoveValidation: false,
-                showRandomVsRandomGame: false,
-                showPlayRandomMoveEngine: false,
-                showAllowDragFeature: false,
-                showPrestoChango: false,
-                showUndoMove: true
-              })
-            }
-            style={{ ...buttonStyle, ...{ backgroundColor: 'pink' } }}
-          >
-            Undo Move
+            Play a level Three Engine
           </button>
         </div>
         <div style={boardsContainer}>
-          {this.state.showCustomizedBoard && <CustomizedBoard />}
-          {this.state.showWithMoveValidation && <WithMoveValidation />}
-          {this.state.showRandomVsRandomGame && <RandomVsRandomGame />}
-          {this.state.showPlayRandomMoveEngine && <PlayRandomMoveEngine />}
-          {this.state.showAllowDragFeature && <AllowDragFeature />}
-          {this.state.showPrestoChango && <PrestoChangoExample />}
-          {this.state.showUndoMove && <UndoMove />}
+          {this.state.LevelOne && <LevelOne />}
+          {this.state.LevelTwo && <PlayRandomMoveEngine />}
+          {this.state.LevelThree && <PlayRandomMoveEngine />}
         </div>
       </div>
     );
