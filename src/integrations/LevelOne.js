@@ -1,8 +1,10 @@
 import React, { Component } from 'react'; // eslint-disable-line no-unused-vars
 import PropTypes from 'prop-types';
 import Chess from 'chess.js';
+import EvalEngine from "./evaluation";
 
 import Chessboard from '../Chessboard';
+
 
 class HumanVsRandom extends Component {
   static propTypes = { children: PropTypes.func };
@@ -13,8 +15,30 @@ class HumanVsRandom extends Component {
     this.game = new Chess();
   }
 
+  minMax = (position, depth, maxPlayer) => {
+    this.game.load(position.board);
+    if (depth === 0 || this.game.game_over()) {
+      return EvalEngine.evalPosition(this.game.ascii(), 32);
+    } else if (maxPlayer) {
+      let maxEval = -Infinity;
+      position.child.foreach((child) => {
+        let nextMove = this.minMax(child, depth - 1, false);
+        maxEval = Math.max(maxEval, nextMove);
+      });
+      return maxEval;
+    } else {
+      let minEval = Infinity;
+      position.child.foreach((child) => {
+        let nextMove = this.minMax(child, depth - 1, false);
+        minEval = Math.min(minEval, nextMove);
+      });
+      return minEval;
+    }
+  }
+
   makeRandomMove = () => {
     let possibleMoves = this.game.moves();
+    console.log(this.game.ascii().replace(/ /g, "").slice(0, 150).replace(/[-+1-8|]/g, ""));
 
     // exit if the game is over
     if (

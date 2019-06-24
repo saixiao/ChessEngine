@@ -1,11 +1,11 @@
-export class Evaluation {
+export default class Evaluation {
 
-    private static Pawn = 100;
-    private static Knight = 300;
-    private static Bishop = 335;
-    private static Rook = 500;
-    private static Queen = 900;
-    private static King = 1800;
+    private static Pawn: number = 100;
+    private static Knight: number = 300;
+    private static Bishop: number = 335;
+    private static Rook: number = 500;
+    private static Queen: number = 900;
+    private static King: number = 1800;
     
     private static BlackPawnEvalTable: number[] = [
         0,  0,  0,  0,  0,  0,  0,  0,
@@ -183,11 +183,11 @@ export class Evaluation {
         -50,-40,-30,-20,-20,-30,-40,-50,
     ]
 
-    public static stripAscii(asciiboard) {
+    public static stripAscii(asciiboard): string[] {
         return asciiboard.replace(/ /g, "").slice(0, 150).replace(/[-+1-8|\n]/g, "").split("");
     }
 
-    public static evalBlack(board, numPieces) {
+    public static evalBlack(board: string[], numPieces: number) {
         let score = 0;
 
         for (let i = 0; i < board.length; i++) {
@@ -217,7 +217,7 @@ export class Evaluation {
         return score;
     }
 
-    public static evalWhite(board, numPieces) {
+    public static evalWhite(board: string[], numPieces: number): number {
         let score = 0;
         
 
@@ -248,7 +248,7 @@ export class Evaluation {
         return score;
     }
 
-    public static evalPosition(asciiboard, numPieces) {
+    public static evalPosition(asciiboard: string, numPieces: number): number {
         let board = this.stripAscii(asciiboard);
         return this.evalWhite(board, numPieces) - this.evalBlack(board, numPieces);
     }
