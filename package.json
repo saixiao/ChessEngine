@@ -7,14 +7,12 @@
   "scripts": {
     "contributors:add": "all-contributors add",
     "contributors:generate": "all-contributors generate",
-    "commit": "git-cz",
     "test": "jest --coverage",
     "build": "webpack --config webpack.prod.js",
     "lint": "eslint src",
     "validate": "npm-run-all --parallel test lint build",
     "travis-deploy-once": "travis-deploy-once",
     "semantic-release": "npx semantic-release",
-    "commitmsg": "commitlint -e $GIT_PARAMS",
     "start": "webpack-dev-server --open --config webpack.dev.js",
     "report-coverage": "cat ./coverage/lcov.info | codecov"
   },
@@ -105,10 +103,6 @@
   "config": {
     "commitizen": {
       "path": "cz-conventional-changelog"
-    },
-    "ghooks": {
-      "pre-commit": "npm run validate",
-      "commit-msg": "npm run commitmsg"
     }
   }
 }
