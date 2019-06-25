@@ -1,24 +1,26 @@
 import React, { Component } from 'react'; // eslint-disable-line no-unused-vars
 import PropTypes from 'prop-types';
 import Chess from 'chess.js';
-import EvalEngine from "./evaluation";
+import EvalEngine from "./evaluation.js";
+import MoveTree from "./moveTree.js";
 
 import Chessboard from '../Chessboard';
 
 
-class HumanVsRandom extends Component {
+class MyChessEngine extends Component {
   static propTypes = { children: PropTypes.func };
 
   state = { fen: 'start', squareStyles: {}, pieceSquare: '' };
 
   componentDidMount() {
     this.game = new Chess();
+    this.EvalEngine = new EvalEngine();
   }
 
   minMax = (position, depth, maxPlayer) => {
     this.game.load(position.board);
     if (depth === 0 || this.game.game_over()) {
-      return EvalEngine.evalPosition(this.game.ascii(), 32);
+      return this.EvalEngine.evalPosition(this.game.ascii(), 32);
     } else if (maxPlayer) {
       let maxEval = -Infinity;
       position.child.foreach((child) => {
@@ -39,14 +41,23 @@ class HumanVsRandom extends Component {
   makeRandomMove = () => {
     let possibleMoves = this.game.moves();
     console.log(this.game.ascii().replace(/ /g, "").slice(0, 150).replace(/[-+1-8|]/g, ""));
+    console.log(possibleMoves);
+
+    let threedepth = new MoveTree(this.game.fen());
+    // console.log(threedepth.getCurrPosition());
+
+    threedepth.generateMoveTree(2, threedepth.currPosition, this.game.fen());
+
+    console.log(threedepth.getCurrPosition());
 
     // exit if the game is over
     if (
       this.game.game_over() === true ||
       this.game.in_draw() === true ||
       possibleMoves.length === 0
-    )
+    ) {
       return;
+    }
 
     let randomIndex = Math.floor(Math.random() * possibleMoves.length);
     this.game.move(possibleMoves[randomIndex]);
@@ -110,7 +121,7 @@ class HumanVsRandom extends Component {
 export default function LevelOne() {
   return (
     <div>
-      <HumanVsRandom>
+      <MyChessEngine>
         {({ position, onDrop, onSquareClick, squareStyles }) => (
           <Chessboard
             calcWidth={({ screenWidth }) => (screenWidth < 500 ? 350 : 480)}
@@ -125,7 +136,7 @@ export default function LevelOne() {
             squareStyles={squareStyles}
           />
         )}
-      </HumanVsRandom>
+      </MyChessEngine>
     </div>
   );
 }

@@ -24,16 +24,18 @@ class HumanVsRandom extends Component {
     )
       return;
 
-    let randomIndex = Math.floor(Math.random() * possibleMoves.length);
-    this.game.move(possibleMoves[randomIndex]);
+    this.game.load("r1bqkbnr/pppppppp/2n5/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 1 2");
+
+    // let randomIndex = Math.floor(Math.random() * possibleMoves.length);
+    // this.game.move(possibleMoves[randomIndex]);
     this.setState({
       fen: this.game.fen(),
-      squareStyles: {
-        [this.game.history({ verbose: true })[this.game.history().length - 1]
-          .to]: {
-          backgroundColor: 'DarkTurquoise'
-        }
-      }
+      // squareStyles: {
+      //   [this.game.history({ verbose: true })[this.game.history().length - 1]
+      //     .to]: {
+      //     backgroundColor: 'DarkTurquoise'
+      //   }
+      // }
     });
   };
 
