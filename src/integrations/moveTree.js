@@ -9,6 +9,9 @@ import EvalEngine from "./evaluation.js";
  * }
  */
 
+ /**
+  * not currently used, might be useful if we can reuse the tree to and build ontop of it to reduce # evaluations
+  */
 export default class MoveTree {
 
     constructor (gameState) {
