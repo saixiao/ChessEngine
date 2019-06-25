@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Chess from 'chess.js';
 import EvalEngine from "./evaluation.js";
 import MoveTree from "./moveTree.js";
+import Position from "./position.js";
 
 import Chessboard from '../Chessboard';
 
@@ -15,40 +16,83 @@ class MyChessEngine extends Component {
   componentDidMount() {
     this.game = new Chess();
     this.EvalEngine = new EvalEngine();
+    this.currPosition = new Position(this.EvalEngine.evalPosition(this.game.ascii(), 32), this.game.fen());
+  }
+
+  alphaBeta = (position, depth, alpha, beta, maxPlayer) => {
+    let game = new Chess();
+    game.load(position.getGameState());
+
+    // check if we hit our leafs or game is over
+    if (depth === 0 || game.game_over()) {
+      return position;
+    } 
+    
+    if (maxPlayer) {
+      let bestWhitePosition = new Position(-Infinity);
+      let nextMoves = position.getNextMoves();
+      for (let i = 0; i < nextMoves.length; i++) {
+        let nextMove = this.alphaBeta(nextMoves[i], depth - 1, alpha, beta, false);
+        if (nextMove.getScore() >= bestWhitePosition.getScore()) {
+          bestWhitePosition = nextMoves[i];
+        }
+        alpha = Math.max(alpha, nextMove.getScore());
+        if (beta <= alpha) {
+          break;
+        }
+      }
+      return bestWhitePosition;
+    } else {
+      let bestBlackPosition = new Position(Infinity);
+      let nextMoves = position.getNextMoves();
+      for (let i = 0; i < nextMoves.length; i++) {
+        let nextMove = this.alphaBeta(nextMoves[i], depth - 1, alpha, beta, false);
+        if (nextMove.getScore() <= bestBlackPosition.getScore()) {
+          bestBlackPosition = nextMoves[i];
+        }
+        beta = Math.min(beta, nextMove.getScore());
+        if (beta <= alpha) {
+          break;
+        }
+      }
+      return bestBlackPosition;
+    }
   }
 
   minMax = (position, depth, maxPlayer) => {
-    this.game.load(position.board);
-    if (depth === 0 || this.game.game_over()) {
-      return this.EvalEngine.evalPosition(this.game.ascii(), 32);
-    } else if (maxPlayer) {
-      let maxEval = -Infinity;
-      position.child.foreach((child) => {
-        let nextMove = this.minMax(child, depth - 1, false);
-        maxEval = Math.max(maxEval, nextMove);
+    let game = new Chess();
+    game.load(position.getGameState());
+
+    // check if we hit our leafs or game is over
+    if (depth === 0 || game.game_over()) {
+      return position;
+    } 
+    
+    if (maxPlayer) {
+      let bestWhitePosition = new Position(-Infinity);
+      position.nextMoves.forEach((move) => {
+        let nextMove = this.minMax(move, depth - 1, false);
+        if (nextMove.getScore() >= bestWhitePosition.getScore()) {
+          bestWhitePosition = move;
+        }
       });
-      return maxEval;
+      return bestWhitePosition;
     } else {
-      let minEval = Infinity;
-      position.child.foreach((child) => {
-        let nextMove = this.minMax(child, depth - 1, false);
-        minEval = Math.min(minEval, nextMove);
+      let bestBlackPosition = new Position(Infinity);
+      position.nextMoves.forEach((move) => {
+        let nextMove = this.minMax(move, depth - 1, false);
+        if (nextMove.getScore() <= bestBlackPosition.getScore()) {
+          bestBlackPosition = move;
+        }
       });
-      return minEval;
+      return bestBlackPosition;
     }
   }
 
   makeRandomMove = () => {
     let possibleMoves = this.game.moves();
     console.log(this.game.ascii().replace(/ /g, "").slice(0, 150).replace(/[-+1-8|]/g, ""));
-    console.log(possibleMoves);
-
-    let threedepth = new MoveTree(this.game.fen());
-    // console.log(threedepth.getCurrPosition());
-
-    threedepth.generateMoveTree(2, threedepth.currPosition, this.game.fen());
-
-    console.log(threedepth.getCurrPosition());
+    console.log(this.currPosition);
 
     // exit if the game is over
     if (
@@ -59,17 +103,37 @@ class MyChessEngine extends Component {
       return;
     }
 
-    let randomIndex = Math.floor(Math.random() * possibleMoves.length);
-    this.game.move(possibleMoves[randomIndex]);
+    // generate a move tree or expand on existing one
+    let start = new Date().getTime();
+    let myTree = new MoveTree(this.game.fen());
+    this.currPosition = myTree.generateMoveTree(2, myTree.getCurrPosition(), this.game.fen());
+    let end = new Date().getTime();
+
+    console.log("TREE GENERATION: ", end - start);
+    console.log(this.currPosition);
+
+    start = new Date().getTime();
+    let bestBlackMove = this.alphaBeta(this.currPosition, 2, -Infinity, Infinity, false);
+    end = new Date().getTime();
+
+    console.log("MINMAX: ", end - start);
+    console.log(bestBlackMove);
+
+    // make move
+    this.game.move(bestBlackMove.getMove());
+    console.log(this.game.ascii().replace(/ /g, "").slice(0, 150).replace(/[-+1-8|]/g, ""));
+    this.currPosition = bestBlackMove;
     this.setState({
       fen: this.game.fen(),
       squareStyles: {
-        [this.game.history({ verbose: true })[this.game.history().length - 1]
-          .to]: {
-          backgroundColor: 'DarkTurquoise'
+          [this.game.history({ verbose: true })[this.game.history().length - 1]
+            .to]: {
+            backgroundColor: 'DarkTurquoise'
+          }
         }
-      }
     });
+
+    console.log("////////////////////////////////////////////////////////////////////");
   };
 
   onDrop = ({ sourceSquare, targetSquare }) => {

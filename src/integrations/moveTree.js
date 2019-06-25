@@ -12,11 +12,11 @@ import EvalEngine from "./evaluation.js";
 export default class MoveTree {
 
     constructor (gameState) {
-        this.game = new Chess();
+        let game = new Chess();
         this.EvalEngine = new EvalEngine();
-        this.game.load(gameState);
+        game.load(gameState);
 
-        let score = this.EvalEngine.evalPosition(this.game.ascii(), 32);
+        let score = this.EvalEngine.evalPosition(game.ascii(), 32);
         this.currPosition = new Position(score, gameState);
     }
 
@@ -27,14 +27,15 @@ export default class MoveTree {
      * @param gameBoard the current state of the actual game
      */
     generateMoveTree(depth, position, gameState) {
-        this.game.load(gameState);
-        let possibleMoves = this.game.moves();
+        let game = new Chess();
+        game.load(gameState);
+        let possibleMoves = game.moves();
 
         // check to see if we hit max depth and if game is over at this point
         if (
             depth == 0,
-            this.game.game_over() === true ||
-            this.game.in_draw() === true ||
+            game.game_over() === true ||
+            game.in_draw() === true ||
             possibleMoves.length === 0
         ) {
             return;
@@ -44,23 +45,45 @@ export default class MoveTree {
 
         // add children positions
         possibleMoves.forEach((move) => {
-            this.game.move(move);
-            let score = this.EvalEngine.evalPosition(this.game.ascii(), 32);
-            let nextPosition = new Position(score, this.game.fen());
-            position.nextMoves.push(nextPosition);
+            game.load(gameState);
+            game.move(move);
+            let score = this.EvalEngine.evalPosition(game.ascii(), 32);
+            let nextPosition = new Position(score, game.fen());
+            nextPosition.setMove(move);
+            position.addNextMove(nextPosition);
         });
 
         // generate and score possible moves after this move
         if (newDepth > 0) {
-            position.nextMoves.forEach((position) => {
-                this.generateMoveTree(newDepth - 1, position, position.gameState);
+            position.nextMoves.forEach((pos) => {
+                this.generateMoveTree(newDepth - 1, pos, pos.getGameState());
             })
         }
 
         return position;
     }
 
+    // Razoring, build ontop of pre-existing tree
+    // expandMoveTree(position) {
+    //     if (position.getNextMoves().length > 0) {
+    //         position.nextMoves.forEach((pos) => {
+    //             this.expandMoveTree(pos);
+    //         })
+    //     }
+
+    //     if (position.getNextMoves().length === 0) {
+    //         this.generateMoveTree(0, position, position.getGameState());
+    //         console.log(position);
+    //     }
+
+    //     return position;
+    // }
+
     getCurrPosition() {
         return this.currPosition;
+    }
+
+    removeNextMoves() {
+        this.currPosition.removeNextMoves();
     }
 }
