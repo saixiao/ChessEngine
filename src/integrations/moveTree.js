@@ -48,12 +48,14 @@ export default class MoveTree {
             let score = this.EvalEngine.evalPosition(this.game.ascii(), 32);
             let nextPosition = new Position(score, this.game.fen());
             position.nextMoves.push(nextPosition);
-
-            // generate and score possible moves after this move
-            if (newDepth > 0) {
-                this.generateMoveTree(newDepth - 1, nextPosition, this.game.fen());
-            }
         });
+
+        // generate and score possible moves after this move
+        if (newDepth > 0) {
+            position.nextMoves.forEach((position) => {
+                this.generateMoveTree(newDepth - 1, position, position.gameState);
+            })
+        }
 
         return position;
     }
