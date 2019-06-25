@@ -4,70 +4,34 @@
 <img src="./src/img/carlsenWorldChampionship2016.png" alt="Carlsen 2016 Championship" width="200">
 <img src="./src/img/sicilian.png" alt="sicilian defense" width="200">
 
-**A chessboard for React inspired by [chessboard.js](https://github.com/oakmac/chessboardjs)**
-
-[![Build Status][build-badge]][build]
-[![Code Coverage][coverage-badge]][coverage]
-[![PRs Welcome][prs-badge]][prs]
-[![version][version-badge]][package]
-[![MIT License][license-badge]][license]
-[![Commitizen friendly][commitzen-badge]][commitzen]
-[![semantic-release][semantic-release-badge]][semantic-release]
+**A chess Engine built on top of [chessboardjsx](https://github.com/willb335/chessboardjsx)**
 
 </div>
 
-## Installation
+# About Engine
 
-This module is distributed via [npm][npm] which is bundled with [node][node] and
-should be installed as one of your project's `dependencies`:
+This chess engine uses alpha-beta pruning algorithm to search for best moves
+
+The evaluation engine calculates position based on a few Heuristics
+    1. Total Piece Values
+    2. Piece Positions (ie. pawns are more valuable futher down the board since they can promote)
+        a. Early game positions
+        b. Mid game positions
+        c. Late game positions
+
+## To Try out the chess engine
 
 ```
-npm install --save chessboardjsx
+git clone git@github.com:saixiao/ChessEngine.git
+
+npm install
+
+npm start
 ```
-
-The package also depends on [React](https://reactjs.org/). Make sure you have that installed as well.
-
-## Usage
-
-* [Props](https://www.chessboardjsx.com/props): get started with Chessboard.jsx
-* [With move validation](https://www.chessboardjsx.com/integrations/move-validation): how to integrate [chess.js](https://github.com/jhlywa/chess.js)
-* [Integrating with chess engines](https://www.chessboardjsx.com/integrations/stockfish): how to integrate with Stockfish, the ~~world's strongest~~ [world's second strongest](https://www.chess.com/news/view/google-s-alphazero-destroys-stockfish-in-100-game-match) chess engine
-* [Custom](https://www.chessboardjsx.com/custom): customize the board and pieces
-
-## Contributing
-
-Please take a look at CONTRIBUTING.md to find out how to contribute.
-
-## What is Chessboard.jsx?
-
-Chessboard.jsx is a React component with a flexible "just a board" API modeled from [chessboard.js](https://github.com/oakmac/chessboardjs). It's compatible with touch as well as standard HTML5 drag and drop.
-
-## What can Chessboard.jsx **not** do?
-
-The scope of Chessboard.jsx is limited to "just a board." This is intentional and
-makes Chessboard.jsx flexible for handling a multitude of chess-related problems.
-
-Specifically, Chessboard.jsx does not understand anything about how the game of
-chess is played: how a knight moves, who's turn is it, is White in check?, etc.
-
-Fortunately, the powerful [chess.js](https://github.com/jhlywa/chess.js) library deals with exactly this sort of
-problem domain and plays nicely with Chessboard.jsx's flexible API.
-
-Here is a list of things that Chessboard.jsx is **not**:
-
-* A chess engine
-* A legal move validator
-* A PGN parser
-
-Chessboard.jsx is designed to work well with any of those software components, but the idea
-behind the library is that the logic that controls the board should be
-independent of those other domains.
 
 ## Contributors
 
-Thanks goes to these wonderful people ([emoji key](https://github.com/kentcdodds/all-contributors#emoji-key)):
-
-This project follows the [all-contributors](https://github.com/kentcdodds/all-contributors) specification. Contributions of any kind welcome!
+Thanks goes to these wonderful people:
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore -->

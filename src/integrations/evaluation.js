@@ -205,110 +205,100 @@ export default class EvalEngine {
     }
 
     // TODO: improve game state detector, better definitions for early, mid and end game
-    evalBlack(board, numPieces) {
-        let score = 0;
-
+    evalPosition(asciiboard, numPieces) {
+        let board = this.stripAscii(asciiboard);
+        let blackScore = 0;
+        let whiteScore = 0;
         for (let i = 0; i < board.length; i++) {
             switch (board[i]) {
+                // black scores
                 case "p":
                     if (numPieces > 12) {
-                        score += this.Pawn + this.BlackPawnEvalTable[i];
+                        blackScore += this.Pawn + this.BlackPawnEvalTable[i];
                     } else {
-                        score += this.PawnEndGame + this.BlackPawnEvalTable[i];
+                        blackScore += this.PawnEndGame + this.BlackPawnEvalTable[i];
                     }
                     break;
                 case "n":
                     if (numPieces > 12) {
-                        score += this.Knight + this.BlackKnightEvalTable[i];
+                        blackScore += this.Knight + this.BlackKnightEvalTable[i];
                     } else {
-                        score += this.KnightEndGame + this.BlackKnightEvalTable[i];
+                        blackScore += this.KnightEndGame + this.BlackKnightEvalTable[i];
                     }
                     break;
                 case "b":
                     if (numPieces > 12) {
-                        score += this.Bishop + this.BlackBishopEvalTable[i];
+                        blackScore += this.Bishop + this.BlackBishopEvalTable[i];
                     } else {
-                        score += this.BishopEndGame + this.BlackBishopEvalTable[i];
+                        blackScore += this.BishopEndGame + this.BlackBishopEvalTable[i];
                     }
                     break;
                 case "r":
                     if (numPieces > 12) {
-                        score += this.Rook + this.BlackRookEvalTable[i];
+                        blackScore += this.Rook + this.BlackRookEvalTable[i];
                     } else {
-                        score += this.RookEndGame + this.BlackRookEvalTable[i];
+                        blackScore += this.RookEndGame + this.BlackRookEvalTable[i];
                     }
                     break;
                 case "q":
                     if (numPieces > 12) {
-                        score += this.Queen + this.BlackQueenEvalTable[i];
+                        blackScore += this.Queen + this.BlackQueenEvalTable[i];
                     } else {
-                        score += this.QueenEndGame + this.BlackQueenEvalTable[i];
+                        blackScore += this.QueenEndGame + this.BlackQueenEvalTable[i];
                     }
                     break;
                 case "k":
                     if (numPieces > 24) {
-                        score += this.King + this.BlackKingEarlyGameEvalTable[i];
+                        blackScore += this.King + this.BlackKingEarlyGameEvalTable[i];
                     } else if (numPieces > 12) {
-                        score += this.King + this.BlackKingMidGameEvalTable[i];
+                        blackScore += this.King + this.BlackKingMidGameEvalTable[i];
                     } else {
-                        score += this.King + this.BlackKingEndGameEvalTable[i];
+                        blackScore += this.King + this.BlackKingEndGameEvalTable[i];
                     }
                     break;
-                default:
-                    break;
-            }
-        }
-
-        return score;
-    }
-
-    evalWhite(board, numPieces) {
-        let score = 0;
-
-        for (let i = 0; i < board.length; i++) {
-            switch (board[i]) {
+                // white scores
                 case "P":
                     if (numPieces > 12) {
-                        score += this.Pawn + this.WhitePawnEvalTable[i];
+                        whiteScore += this.Pawn + this.WhitePawnEvalTable[i];
                     } else {
-                        score += this.PawnEndGame + this.WhitePawnEvalTable[i];
+                        whiteScore += this.PawnEndGame + this.WhitePawnEvalTable[i];
                     }
                     break;
                 case "N":
                     if (numPieces > 12) {
-                        score += this.Knight + this.WhiteKnightEvalTable[i];
+                        whiteScore += this.Knight + this.WhiteKnightEvalTable[i];
                     } else {
-                        score += this.KnightEndGame + this.WhiteKnightEvalTable[i];
+                        whiteScore += this.KnightEndGame + this.WhiteKnightEvalTable[i];
                     }
                     break;
                 case "B":
                     if (numPieces > 12) {
-                        score += this.Bishop + this.WhiteBishopEvalTable[i];
+                        whiteScore += this.Bishop + this.WhiteBishopEvalTable[i];
                     } else {
-                        score += this.BishopEndGame + this.WhiteBishopEvalTable[i];
+                        whiteScore += this.BishopEndGame + this.WhiteBishopEvalTable[i];
                     }
                     break;
                 case "R":
                     if (numPieces > 12) {
-                        score += this.Rook + this.WhiteRookEvalTable[i];
+                        whiteScore += this.Rook + this.WhiteRookEvalTable[i];
                     } else {
-                        score += this.RookEndGame + this.WhiteRookEvalTable[i];
+                        whiteScore += this.RookEndGame + this.WhiteRookEvalTable[i];
                     }
                     break;
                 case "Q":
                     if (numPieces > 12) {
-                        score += this.Queen + this.WhiteQueenEvalTable[i];
+                        whiteScore += this.Queen + this.WhiteQueenEvalTable[i];
                     } else {
-                        score += this.QueenEndGame + this.WhiteQueenEvalTable[i];
+                        whiteScore += this.QueenEndGame + this.WhiteQueenEvalTable[i];
                     }
                     break;
                 case "K":
                     if (numPieces > 24) {
-                        score += this.King + this.WhiteKingEarlyGameEvalTable[i];
+                        whiteScore += this.King + this.WhiteKingEarlyGameEvalTable[i];
                     } else if (numPieces > 12) {
-                        score += this.King + this.WhiteKingMidGameEvalTable[i];
+                        whiteScore += this.King + this.WhiteKingMidGameEvalTable[i];
                     } else {
-                        score += this.King + this.WhiteKingEndGameEvalTable[i];
+                        whiteScore += this.King + this.WhiteKingEndGameEvalTable[i];
                     }
                     break;
                 default:
@@ -316,15 +306,7 @@ export default class EvalEngine {
             }
         }
 
-        return score;
-    }
-
-    evalPosition(asciiboard, numPieces) {
-        let board = this.stripAscii(asciiboard);
-        // console.log("WHITE: ", this.evalWhite(board, numPieces));
-        // console.log("BLACK: ", this.evalBlack(board, numPieces));
-
-        return this.evalWhite(board, numPieces) - this.evalBlack(board, numPieces);
+        return whiteScore - blackScore;
     }
 
     // TODO: add setters for pawn, bishop, knight, rook values since they may change

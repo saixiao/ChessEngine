@@ -13,6 +13,7 @@ class MyChessEngine extends Component {
   state = { fen: 'start', squareStyles: {}, pieceSquare: '' };
 
   componentDidMount() {
+    this.depth = 3;
     this.game = new Chess();
     this.EvalEngine = new EvalEngine();
     this.currPosition = new Position(this.EvalEngine.evalPosition(this.game.ascii(), 32), this.game.fen());
@@ -82,7 +83,6 @@ class MyChessEngine extends Component {
     let possibleMoves = this.game.moves();
     this.currPosition = new Position(this.EvalEngine.evalPosition(this.game.ascii(), 32), this.game.fen());
     console.log(this.game.ascii().replace(/ /g, "").slice(0, 150).replace(/[-+1-8|]/g, ""));
-    console.log(this.currPosition);
 
     // exit if the game is over
     if (
@@ -94,11 +94,11 @@ class MyChessEngine extends Component {
     }
 
     let start = new Date().getTime();
-    let bestBlackMove = this.alphaBeta(this.currPosition, 3, -Infinity, Infinity, false);
+    let bestBlackMove = this.alphaBeta(this.currPosition, this.depth, -Infinity, Infinity, false);
     let end = new Date().getTime();
 
-    console.log("MINMAX: ", end - start);
-    console.log(bestBlackMove);
+    console.log("ALPHABETA ALGO TIME: ", end - start);
+    console.log("BLACKMOVE: ", bestBlackMove);
 
     // make move
     this.game.move(bestBlackMove.getMove());
