@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import LevelOne from "./integrations/myChessEngine";
+import LevelOne from "./ChessEngine/myChessEngine";
 
 class Demo extends Component {
   state = {
