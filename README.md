@@ -8,16 +8,16 @@
 
 </div>
 
-# About Engine
+## About Engine
 
-This chess engine uses alpha-beta pruning algorithm to search for best moves
+This chess engine uses alpha-beta pruning algorithm to search for best moves.
 
-The evaluation engine calculates position based on a few Heuristics
-    1. Total Piece Values
-    2. Piece Positions (ie. pawns are more valuable futher down the board since they can promote)
-        a. Early game positions
-        b. Mid game positions
-        c. Late game positions
+The evaluation engine calculates position based on a few Heuristics:
+1. Total Piece Values
+2. Piece Positions (ie. pawns are more valuable futher down the board since they can promote)
+    * Early game positions
+    * Mid game positions
+    * Late game positions
 
 ## To Try out the chess engine
 
@@ -29,9 +29,10 @@ npm install
 npm start
 ```
 
+
 ## Contributors
 
-Thanks goes to these wonderful people:
+Thanks to the people who made chessboardjsx
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore -->
