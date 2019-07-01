@@ -8,11 +8,12 @@ import EvalEngine from "./evaluation.js";
 export default class MoveTree {
 
     constructor (gameState) {
-        let game = new Chess();
+        this.game = new Chess();
+        this.movesToConsider = 5;
         this.EvalEngine = new EvalEngine();
-        game.load(gameState);
+        this.game.load(gameState);
 
-        let score = this.EvalEngine.evalPosition(game.ascii(), 32);
+        let score = this.EvalEngine.evalPosition(this.game.ascii(), 0);
         this.currPosition = new Position(score, gameState);
     }
 
@@ -22,16 +23,15 @@ export default class MoveTree {
      * @param position the current position (position object) with the score and children
      * @param gameBoard the current state of the actual game
      */
-    generateMoveTree(depth, position, gameState) {
-        let game = new Chess();
-        game.load(gameState);
-        let possibleMoves = game.moves();
+    generateMoveTree(depth, position, gameState, maxPlayer) {
+        this.game.load(gameState);
+        let possibleMoves = this.game.moves();
 
         // check to see if we hit max depth and if game is over at this point
         if (
             depth == 0,
-            game.game_over() === true ||
-            game.in_draw() === true ||
+            this.game.game_over() === true ||
+            this.game.in_draw() === true ||
             possibleMoves.length === 0
         ) {
             return;
@@ -41,19 +41,47 @@ export default class MoveTree {
 
         // add children positions
         possibleMoves.forEach((move) => {
-            game.load(gameState);
-            game.move(move);
-            let score = this.EvalEngine.evalPosition(game.ascii(), 32);
-            let nextPosition = new Position(score, game.fen());
+            this.game.load(gameState);
+            this.game.move(move);
+            let score = this.EvalEngine.evalPosition(this.game.ascii(), this.getMoveCount());
+            let nextPosition = new Position(score, this.game.fen());
             nextPosition.setMove(move);
             position.addNextMove(nextPosition);
         });
 
+        if (maxPlayer) {
+            position.nextMoves.sort((a, b) => {
+                return b.getScore() - a.getScore();
+            });
+        } else {
+            position.nextMoves.sort((a, b) => {
+                return a.getScore() - b.getScore();
+            });
+        }
+        
+
+        let counter = this.movesToConsider;
+        position.nextMoves = position.nextMoves.filter(() => {
+            if (counter > 0) {
+                counter--;
+                return true;
+            }
+        })
+
+        console.log(position.nextMoves);
+
         // generate and score possible moves after this move
         if (newDepth > 0) {
-            position.nextMoves.forEach((pos) => {
-                this.generateMoveTree(newDepth - 1, pos, pos.getGameState());
-            })
+            if (maxPlayer) {
+                position.nextMoves.forEach((pos) => {
+                    this.generateMoveTree(newDepth - 1, pos, pos.getGameState(), false);
+                })
+            } else {
+                position.nextMoves.forEach((pos) => {
+                    this.generateMoveTree(newDepth - 1, pos, pos.getGameState(), true);
+                })
+            }
+            
         }
 
         return position;
@@ -77,6 +105,10 @@ export default class MoveTree {
 
     getCurrPosition() {
         return this.currPosition;
+    }
+
+    getMoveCount() {
+        return this.game.fen().match(/\d+$/)[0];
     }
 
     removeNextMoves() {

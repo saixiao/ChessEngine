@@ -4,16 +4,16 @@ export default class EvalEngine {
         // general chess piece values, p = 1, b,k = 3, r = 5, q = 9
         this.Pawn = 100;
         this.Knight = 300;
-        this.Bishop = 335;
+        this.Bishop = 300;
         this.Rook = 500;
         this.Queen = 900;
-        this.King = 2500;
+        this.King = 1500;
 
         // as the game becomes more open some pieces increase in value
         // pawns have the chance to promote, board is more open for bishops, rooks, and queens to threaten more space
         this.PawnEndGame = 125;
         this.KnightEndGame = 300;
-        this.BishopEndGame = 360;
+        this.BishopEndGame = 350;
         this.RookEndGame = 520;
         this.QueenEndGame = 900;
     }
