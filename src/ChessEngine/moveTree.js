@@ -3,15 +3,8 @@ import Position from "./position.js";
 import EvalEngine from "./evaluation.js";
 
 /**
- * interface IPosition {
- *      score: number;
- *      nextMove: [Positions]
- * }
+ * TODO: implement a way to generate a alpha-beta pruned tree that can be reused and expanded upon a move to reduce # evaluations
  */
-
- /**
-  * not currently used, might be useful if we can reuse the tree to and build ontop of it to reduce # evaluations
-  */
 export default class MoveTree {
 
     constructor (gameState) {

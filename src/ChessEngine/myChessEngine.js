@@ -14,74 +14,111 @@ class MyChessEngine extends Component {
 
   componentDidMount() {
     this.depth = 3;
+    this.goodMoveRange = 400;
     this.game = new Chess();
     this.EvalEngine = new EvalEngine();
-    this.currPosition = new Position(this.EvalEngine.evalPosition(this.game.ascii(), 32), this.game.fen());
+    this.currPosition = new Position(this.EvalEngine.evalPosition(this.game.ascii(), this.getMoveCount()), this.game.fen());
   }
 
+  /**
+   * This is a modified alpha-beta algorithm. It chooses a handful of nodes to use the search algorithm on.
+   * In turn based games, almost always the opponent can improve their position given any board.
+   * Thus we don't want to consider any moves we make that would put us into a worse position.
+   * Also we have a score so that we don't consider anymoves that are far worse than our current move.
+   */
   alphaBeta = (position, depth, alpha, beta, maxPlayer) => {
     let game = new Chess();
     game.load(position.getGameState());
-    let possibleMoves = game.moves();
-
-    // check if we hit our leafs or game is over
     if (depth === 0 || game.game_over()) {
       return position;
-    } 
-    
+    }
+
+    const currentScore = this.EvalEngine.evalPosition(game.ascii(), this.getMoveCount());
+
+    let moves = game.moves()
+    let possibleMoves = moves.map((move) => {
+      game.load(position.getGameState());
+      game.move(move);
+      let pos = new Position(this.EvalEngine.evalPosition(game.ascii(), this.getMoveCount()), game.fen());
+      pos.setMove(move);
+      return pos;
+    });
+    game.load(position.getGameState());
+
+    // white to move
     if (maxPlayer) {
-      let bestWhitePosition = new Position(-Infinity);
-      let nextMoves = [];
-      possibleMoves.forEach((move) => {
-          game.load(position.getGameState());
-          game.move(move);
-          let score = this.EvalEngine.evalPosition(game.ascii(), 32);
-          let nextPosition = new Position(score, game.fen());
-          nextPosition.setMove(move);
-          nextMoves.push(nextPosition);
+      console.log("WHITE");
+      // sort by moves that will give us best result and filter out moves that don't seem as good or put us into an even worse position
+      // this prevents the chess engine from making risker plays like sacrificing pieces, but will make the better move generally
+      possibleMoves.sort((a, b) => {
+        return b.getScore() - a.getScore();
       });
 
-      for (let i = 0; i < nextMoves.length; i++) {
-        let nextMove = this.alphaBeta(nextMoves[i], depth - 1, alpha, beta, false);
-        if (nextMove.getScore() >= bestWhitePosition.getScore()) {
-          bestWhitePosition = nextMoves[i];
+      // the currentboard might not be a good position at all
+      const goodScore = Math.max(possibleMoves[0].getScore() - this.goodMoveRange, currentScore);
+
+      possibleMoves = possibleMoves.filter((move) => {
+        return move.getScore() > goodScore;
+      })
+
+      console.log(goodScore, possibleMoves);
+
+      let bestWhitePosition = new Position(-Infinity);
+      for (let i = 0; i < possibleMoves.length; i++) {
+        game.load(position.getGameState());
+        game.move(possibleMoves[i]);
+        let nextMove = this.alphaBeta(possibleMoves[i], depth - 1, alpha, beta, false);
+        if (nextMove.getScore() > bestWhitePosition.getScore()) {
+          bestWhitePosition = possibleMoves[i];
         }
-        alpha = Math.max(alpha, nextMove.getScore());
+        if (alpha < nextMove.getScore()) {
+          alpha = nextMove.getScore();
+        }
         if (beta <= alpha) {
           break;
         }
       }
       return bestWhitePosition;
 
-    } else {
-      let bestBlackPosition = new Position(Infinity);
-      let nextMoves = [];
-      possibleMoves.forEach((move) => {
-          game.load(position.getGameState());
-          game.move(move);
-          let score = this.EvalEngine.evalPosition(game.ascii(), 32);
-          let nextPosition = new Position(score, game.fen());
-          nextPosition.setMove(move);
-          nextMoves.push(nextPosition);
+    } 
+    // black to move
+    else {
+      console.log("BLACK")
+      // sort by moves that will give us best result (lowests score in this case is best)
+      possibleMoves.sort((a, b) => {
+        return a.getScore() - b.getScore();
+      });
+      const goodScore = Math.min(possibleMoves[0].getScore() + this.goodMoveRange, currentScore);
+
+      possibleMoves = possibleMoves.filter((move) => {
+        return move.getScore() < goodScore;
       });
 
-      for (let i = 0; i < nextMoves.length; i++) {
-        let nextMove = this.alphaBeta(nextMoves[i], depth - 1, alpha, beta, false);
-        if (nextMove.getScore() <= bestBlackPosition.getScore()) {
-          bestBlackPosition = nextMoves[i];
+      console.log(goodScore, possibleMoves);
+
+      let bestBlackPosition = new Position(Infinity);
+      for (let i = 0; i < possibleMoves.length; i++) {
+        game.load(position.getGameState());
+        game.move(possibleMoves[i]);
+        let nextMove = this.alphaBeta(possibleMoves[i], depth - 1, alpha, beta, true);
+        if (nextMove.getScore() < bestBlackPosition.getScore()) {
+          bestBlackPosition = possibleMoves[i];
         }
-        beta = Math.min(beta, nextMove.getScore());
+        if (beta > nextMove.getScore()) {
+          beta = nextMove.getScore();
+        }
         if (beta <= alpha) {
           break;
         }
       }
       return bestBlackPosition;
+
     }
   }
 
   makeRandomMove = () => {
     let possibleMoves = this.game.moves();
-    this.currPosition = new Position(this.EvalEngine.evalPosition(this.game.ascii(), 32), this.game.fen());
+    this.currPosition = new Position(this.EvalEngine.evalPosition(this.game.ascii(), this.getMoveCount()), this.game.fen());
     console.log(this.game.ascii().replace(/ /g, "").slice(0, 150).replace(/[-+1-8|]/g, ""));
 
     // exit if the game is over
@@ -92,6 +129,8 @@ class MyChessEngine extends Component {
     ) {
       return;
     }
+
+    console.log(this.getMoveCount());
 
     let start = new Date().getTime();
     let bestBlackMove = this.alphaBeta(this.currPosition, this.depth, -Infinity, Infinity, false);
@@ -115,6 +154,10 @@ class MyChessEngine extends Component {
 
     console.log("---------------- YOUR TURN ----------------");
   };
+
+  getMoveCount() {
+    return this.game.fen().match(/\d+$/)[0];
+  }
 
   onDrop = ({ sourceSquare, targetSquare }) => {
     // see if the move is legal

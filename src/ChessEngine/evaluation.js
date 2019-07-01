@@ -11,20 +11,20 @@ export default class EvalEngine {
 
         // as the game becomes more open some pieces increase in value
         // pawns have the chance to promote, board is more open for bishops, rooks, and queens to threaten more space
-        this.PawnEndGame = 140;
-        this.KnightEndGame = 280;
-        this.BishopEndGame = 380;
-        this.RookEndGame = 600;
-        this.QueenEndGame = 1000;
+        this.PawnEndGame = 125;
+        this.KnightEndGame = 300;
+        this.BishopEndGame = 360;
+        this.RookEndGame = 520;
+        this.QueenEndGame = 900;
     }
     
     // Pawn Maps
     WhitePawnEvalTable = [
         0,  0,  0,  0,  0,  0,  0,  0,
         50, 50, 50, 50, 50, 50, 50, 50,
-        10, 10, 20, 30, 30, 20, 10, 10,
-        5,  5, 10, 25, 25, 10,  5,  5,
-        0,  0,  0, 20, 20,  0,  0,  0,
+        10, 10, 20, 40, 40, 20, 10, 10,
+        5,  5, 10, 35, 35, 10,  5,  5,
+        0,  0,  0, 35, 35,  0,  0,  0,
         0, 5, -10,  0,  0, -10, 5,  0,
         5, 10, 10,-20,-20, 10, 10,  5,
         0,  0,  0,  0,  0,  0,  0,  0,
@@ -34,7 +34,7 @@ export default class EvalEngine {
         0,  0,  0,  0,  0,  0,  0,  0,
         5, 10, 10,-20,-20, 10, 10,  5,
         5, -5,-10,  0,  0,-10, -5,  5,
-        0,  0,  0, 25, 25,  0,  0,  0,
+        0,  0, 25, 20, 35,  0,  0,  0,
         5,  5, 10, 25, 25, 10,  5,  5,
         10, 10, 20, 30, 30, 20, 10, 10, 
         50, 50, 50, 50, 50, 50, 50, 50, 
@@ -50,11 +50,11 @@ export default class EvalEngine {
         -30,  0, 15, 20, 20, 15,  0,-30,
         -30,  5, 10, 15, 15, 10,  5,-30,
         -40,-20,  0,  5,  5,  0,-20,-40,
-        -50,-40,-30,-30,-30,-30,-40,-50,
+        -50,  0,-40,-40,-40,-40,  0,-50,
     ]
 
     BlackKnightEvalTable = [
-        -50,-40,-30,-30,-30,-30,-40,-50,
+        -50,  0,-40,-50,-50,-40,  0,-50,
         -40,-20,  0,  5,  5,  0,-20,-40,
         -30,  5, 10, 15, 15, 10,  5,-30,
         -30,  0, 15, 20, 20, 15,  0,-30,
@@ -73,11 +73,11 @@ export default class EvalEngine {
         -10,  0, 10, 10, 10, 10,  0,-10,
         -10, 10, 10, 10, 10, 10, 10,-10,
         -10,  5,  0,  0,  0,  0,  5,-10,
-        -20,-10,-10,-10,-10,-10,-10,-20,
+        -20,-10,  0,-10,-10,  0,-10,-20,
     ]
 
     BlackBishopEvalTable = [
-        -20,-10,-10,-10,-10,-10,-10,-20,
+        -20,-10,  0,-10,-10,  0,-10,-20,
         -10,  5,  0,  0,  0,  0,  5,-10,
         -10, 10, 10, 10, 10, 10, 10,-10,
         -10,  0, 10, 10, 10, 10,  0,-10,
@@ -205,7 +205,8 @@ export default class EvalEngine {
     }
 
     // TODO: improve game state detector, better definitions for early, mid and end game
-    evalPosition(asciiboard, numPieces) {
+    // Looking at some chess website statistics, games usually last around 60-80 moves, with midgame around move 15-20 and endgame after 50
+    evalPosition(asciiboard, turn) {
         let board = this.stripAscii(asciiboard);
         let blackScore = 0;
         let whiteScore = 0;
@@ -213,44 +214,44 @@ export default class EvalEngine {
             switch (board[i]) {
                 // black scores
                 case "p":
-                    if (numPieces > 12) {
+                    if (turn < 50) {
                         blackScore += this.Pawn + this.BlackPawnEvalTable[i];
                     } else {
                         blackScore += this.PawnEndGame + this.BlackPawnEvalTable[i];
                     }
                     break;
                 case "n":
-                    if (numPieces > 12) {
+                    if (turn < 50) {
                         blackScore += this.Knight + this.BlackKnightEvalTable[i];
                     } else {
                         blackScore += this.KnightEndGame + this.BlackKnightEvalTable[i];
                     }
                     break;
                 case "b":
-                    if (numPieces > 12) {
+                    if (turn < 50) {
                         blackScore += this.Bishop + this.BlackBishopEvalTable[i];
                     } else {
                         blackScore += this.BishopEndGame + this.BlackBishopEvalTable[i];
                     }
                     break;
                 case "r":
-                    if (numPieces > 12) {
+                    if (turn < 50) {
                         blackScore += this.Rook + this.BlackRookEvalTable[i];
                     } else {
                         blackScore += this.RookEndGame + this.BlackRookEvalTable[i];
                     }
                     break;
                 case "q":
-                    if (numPieces > 12) {
+                    if (turn < 50) {
                         blackScore += this.Queen + this.BlackQueenEvalTable[i];
                     } else {
                         blackScore += this.QueenEndGame + this.BlackQueenEvalTable[i];
                     }
                     break;
                 case "k":
-                    if (numPieces > 24) {
+                    if (turn < 20) {
                         blackScore += this.King + this.BlackKingEarlyGameEvalTable[i];
-                    } else if (numPieces > 12) {
+                    } else if (turn < 50) {
                         blackScore += this.King + this.BlackKingMidGameEvalTable[i];
                     } else {
                         blackScore += this.King + this.BlackKingEndGameEvalTable[i];
@@ -258,44 +259,44 @@ export default class EvalEngine {
                     break;
                 // white scores
                 case "P":
-                    if (numPieces > 12) {
+                    if (turn < 50) {
                         whiteScore += this.Pawn + this.WhitePawnEvalTable[i];
                     } else {
                         whiteScore += this.PawnEndGame + this.WhitePawnEvalTable[i];
                     }
                     break;
                 case "N":
-                    if (numPieces > 12) {
+                    if (turn < 50) {
                         whiteScore += this.Knight + this.WhiteKnightEvalTable[i];
                     } else {
                         whiteScore += this.KnightEndGame + this.WhiteKnightEvalTable[i];
                     }
                     break;
                 case "B":
-                    if (numPieces > 12) {
+                    if (turn < 50) {
                         whiteScore += this.Bishop + this.WhiteBishopEvalTable[i];
                     } else {
                         whiteScore += this.BishopEndGame + this.WhiteBishopEvalTable[i];
                     }
                     break;
                 case "R":
-                    if (numPieces > 12) {
+                    if (turn < 50) {
                         whiteScore += this.Rook + this.WhiteRookEvalTable[i];
                     } else {
                         whiteScore += this.RookEndGame + this.WhiteRookEvalTable[i];
                     }
                     break;
                 case "Q":
-                    if (numPieces > 12) {
+                    if (turn < 50) {
                         whiteScore += this.Queen + this.WhiteQueenEvalTable[i];
                     } else {
                         whiteScore += this.QueenEndGame + this.WhiteQueenEvalTable[i];
                     }
                     break;
                 case "K":
-                    if (numPieces > 24) {
+                    if (turn < 20) {
                         whiteScore += this.King + this.WhiteKingEarlyGameEvalTable[i];
-                    } else if (numPieces > 12) {
+                    } else if (turn < 50) {
                         whiteScore += this.King + this.WhiteKingMidGameEvalTable[i];
                     } else {
                         whiteScore += this.King + this.WhiteKingEndGameEvalTable[i];
